@@ -7,6 +7,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 use App\Category;
 use App\Post;
+use App\Tag;
 
 class PostController extends Controller
 {
@@ -15,7 +16,8 @@ class PostController extends Controller
         "content"=>"required",
         "published" => "sometimes|accepted",
         "category_id"=>"nullable|exists:categories,id",
-        "image" => "nullable|mimes:jpg,jpeg,png,gif,webp|max:2048"
+        "image" => "nullable|mimes:jpg,jpeg,png,gif,webp|max:2048",
+        "tags" => "nullable|exists:tags,id"
     ];
     /**
      * Display a listing of the resource.
@@ -36,8 +38,9 @@ class PostController extends Controller
      */
     public function create()
     {
+        $tags = Tag::all();
         $categories = Category::all();
-        return view('admin.posts.create', compact("categories"));
+        return view('admin.posts.create', compact("categories","tags"));
     }
 
     /**
@@ -74,6 +77,10 @@ class PostController extends Controller
 
         $newPost->save();
 
+        if(isset($data["tags"])){
+            $newPost->tags()->sync($data["tags"]);
+        }
+
         // redirect al post appena creato
         return redirect()->route("posts.show", $newPost->id);
     }
@@ -97,9 +104,10 @@ class PostController extends Controller
      */
     public function edit(Post $post)
     {
+        $tags = Tag::all();
         $categories = Category::all();
 
-         return view('admin.posts.edit', compact("post","categories"));
+         return view('admin.posts.edit', compact("post","categories",'tags'));
     }
 
     /**
@@ -141,6 +149,10 @@ class PostController extends Controller
         }
 
         $post->save();
+
+          if(isset($data["tags"])){
+          $post->tags()->sync($data["tags"]);
+        }
 
         return redirect()->route("posts.show", $post->id);
 

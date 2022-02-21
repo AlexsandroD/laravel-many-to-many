@@ -17,15 +17,24 @@
                     <div>
                         <strong>Stato:</strong>
                         @if ($post->published)
-                         <span class="badge badge-success m-3">Pubblicato</span>
+                         <span class="badge badge-success p-1 m-3">Pubblicato</span>
                         @else
-                         <span class="badge badge-secondary m-3">Bozza</span>
+                         <span class="badge badge-secondary p-1 m-3">Bozza</span>
                         @endif
                     </div>
 
                     <div>
                         @if($post->category)
                             <strong>Category: {{ $post->category->name}}</strong>
+                        @endif
+                    </div>
+
+                    <div>
+                        @if(count($post->tags) > 0)
+                            <strong>Tag:</strong>
+                            @foreach ($post->tags as $tag)
+                                 <span class="badge badge-primary p-1 m-3">{{ $tag->name }}</span>
+                            @endforeach
                         @endif
                     </div>
 

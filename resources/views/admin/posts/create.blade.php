@@ -42,6 +42,16 @@
                             @enderror
                         </div>
 
+                        {{-- Tags  --}}
+                        @foreach($tags as $tag)
+                            <div class="form-check form-check-inline my-2">
+                                <input type="checkbox" class="form-check-input" class = "form-control id="{{ $tag->slug }} " name="tags[]" value="{{ $tag->id}}" {{in_array($tag->id,old("tags",[])) ? 'checked="checked"' : ''}}>
+                                <label class="form-check-label" for="{{ $tag->slug }}">{{ $tag->name }}</label>
+                            </div>
+                             @error('tags')
+                                <div class="alert alert-danger">{{ $message }}</div>
+                             @enderror
+                        @endforeach
 
                         {{-- checkbox --}}
                          <div class="form-group form-check">
