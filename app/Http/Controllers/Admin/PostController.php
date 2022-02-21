@@ -54,34 +54,28 @@ class PostController extends Controller
         // creazione del post
         $data = $request->all();
         $newPost = new Post ();
-        $newPost->title = $data['title'];
-        $newPost->content = $data['content'];
-        $newPost->category_id = $data['category_id'];
+        $newPost->fill($data);
 
-        if( isset($data['published']) ) {
+        // if( isset($data['published']) ) {
 
-            $newPost->published = true;
+        //     $newPost->published = true;
+        // }
+
+        $newPost->published = isset($data["published"]);
+
+
+
+        $newPost->slug = $this->getSlug($newPost->title);
+
+        if( isset($data['image']) ) {
+            $path_image = Storage::put("uploads",$data['image']);
+            $newPost->image = $path_image;
         }
 
+        $newPost->save();
 
-            $slug = Str::of($newPost->title)->slug("-");
-            $count = 1;
-
-            while( Post::where("slug",$slug)->first() ){
-                $slug = Str::of($newPost->title)->slug("-") . "-{$count}";
-                $count++;
-            }
-            $newPost->slug = $slug;
-
-            if( isset($data['image']) ) {
-                $path_image = Storage::put("uploads",$data['image']);
-                $newPost->image = $path_image;
-            }
-
-            $newPost->save();
-
-            // redirect al post appena creato
-            return redirect()->route("posts.show", $newPost->id);
+        // redirect al post appena creato
+        return redirect()->route("posts.show", $newPost->id);
     }
 
     /**
@@ -117,39 +111,38 @@ class PostController extends Controller
      */
     public function update(Request $request,Post $post)
     {
-          $request->validate($this->validationRule);
 
 
-            $data = $request->all();
 
+        $request->validate($this->validationRule);
+
+
+        $data = $request->all();
+
+
+        if( $post->title != $data['title']) {
             $post->title = $data['title'];
-            $post->content = $data['content'];
-            $post->category_id = $data['category_id'];
-            if( isset($data['published']) ) {
-                $post->published = true;
-            }
 
             $slug = Str::of($post->title)->slug("-");
-            $count = 1;
 
-            while( Post::where("slug",$slug)->first() ){
-                $slug = Str::of($post->title)->slug("-") . "-{$count}";
-                $count++;
+            if($slug != $post->slug) {
+
+                $post->slug = $this->getSlug($post->title);
+
             }
-            $post->slug = $slug;
+        }
 
+        $post->fill($data);
 
+        if( isset($data['image']) ) {
+            Storage::delete($post->image);
+            $path_image = Storage::put("uploads",$data['image']);
+            $post->image = $path_image;
+        }
 
-            if( isset($data['image']) ) {
-                Storage::delete($post->image);
-                $path_image = Storage::put("uploads",$data['image']);
-                $post->image = $path_image;
-            }
+        $post->save();
 
-
-            $post->save();
-
-            return redirect()->route("posts.show", $post->id);
+        return redirect()->route("posts.show", $post->id);
 
     }
 
@@ -162,7 +155,25 @@ class PostController extends Controller
      */
     public function destroy(Post $post)
     {
+        if($post->image){
+            Storage::delete($post->image);
+        }
+
         $post->delete();
+
         return redirect()->route('posts.index');
+    }
+
+    private function getSlug($title){
+
+        $slug = Str::of($title)->slug("-");
+        $count = 1;
+
+        while( Post::where("slug",$slug)->first() ){
+            $slug = Str::of($title)->slug("-") . "-{$count}";
+            $count++;
+        }
+
+        return $slug;
     }
 }
