@@ -38,7 +38,7 @@
                                 @else
                                      <input type="checkbox" class="form-check-input" class = "form-control id="{{ $tag->slug }} " name="tags[]" value="{{ $tag->id}}" {{ $post->tags->contains($tag) ? 'checked="checked"' : ''}}>
                                 @endif
-                                <label class="form-check-label" for="{{ $tag->slug }}">{{ $tag->name }}</label>
+                                <label class="form-check-label" for="{{ $tag->name }}">{{ $tag->name }}</label>
                             </div>
                              @error('tags')
                                 <div class="alert alert-danger">{{ $message }}</div>

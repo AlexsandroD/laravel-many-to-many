@@ -20,6 +20,7 @@
                                 <th scope="col">Slug</th>
                                 <th scope="col">State</th>
                                 <th scope="col">Category</th>
+                                <th scope="col">Tags</th>
                                 <th scope="col">Actions</th>
                             </tr>
                         </thead>
@@ -42,6 +43,18 @@
                                         @else
                                             <span class="badge badge-secondary m-3">None</span>
                                         @endif
+                                    </td>
+                                     <td>
+                                        @if ($post->tags)
+                                            @foreach ($post->tags as $tag)
+                                                <span class="badge badge-success p-1 m-3">{{ $tag->name }}</span>
+                                            @endforeach
+                                        @else
+                                            @foreach ($post->tags as $tag)
+                                                <span class="badge badge-secondary m-3">None</span>
+                                            @endforeach
+                                        @endif
+
                                     </td>
                                     <td class="text-center">
                                         <a class="btn btn-primary" style=" min-width: 80px" href="{{ route("posts.show",$post->id) }}" role="button">Viualizza</a>
